@@ -1,0 +1,15 @@
+Please write a classic  text game as a Go program. The
+user thinks of an animal and the program asks questions about the
+properties of the animal, like does it walk or swim. Eventually the
+program will say is it an X, and if the user is not thinking of
+X, the program will ask what differentiates an X from what you are
+thinking of, the user's answer is added to the data structure that
+the program is keeping. The program should store the answers in a file,
+so over time the program will become more and more knowledgeable about
+the properties of animals. The data structure used is typically a
+tree. The data structure should start with the question is it a human? (yes or no)?
+If the user say yes, the computer wins. If the user says no, 
+then the program should ask what the user was thinking of, and what differentiates
+the user's animal from a human, and adds that to the database. The game is run
+over and over. when the user indicates they are done, the database should be
+be written to a file for subseqent executions of the game.
