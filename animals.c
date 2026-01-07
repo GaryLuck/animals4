@@ -143,7 +143,7 @@ void play_game(Node **current) {
             fgets(answer, MAX_LINE, stdin);
             answer[strcspn(answer, "\n")] = 0;
 
-            if (strcasecmp(answer, "yes") == 0 || strcasecmp(answer, "y") == 0) {
+            if (strcmp(answer, "yes") == 0 || strcmp(answer, "y") == 0) {
                 old_guess->yes = new_animal;
                 old_guess->no = old_animal;
             } else {
