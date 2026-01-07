@@ -43,11 +43,11 @@ int get_yes_no(const char *prompt) {
     char answer[MAX_LINE];
     printf("%s (yes/no): ", prompt);
     fgets(answer, MAX_LINE, stdin);
-    
+
     // Remove newline
     answer[strcspn(answer, "\n")] = 0;
-    
-    if (strcasecmp(answer, "yes") == 0 || strcasecmp(answer, "y") == 0) {
+
+    if (strcmp(answer, "yes") == 0 || strcmp(answer, "y") == 0) {
         return 1;
     }
     return 0;
@@ -66,7 +66,7 @@ void save_tree(FILE *fp, Node *node) {
         fprintf(fp, "NULL\n");
         return;
     }
-    
+
     fprintf(fp, "%s\n", node->question);
     save_tree(fp, node->yes);
     save_tree(fp, node->no);
@@ -75,18 +75,18 @@ void save_tree(FILE *fp, Node *node) {
 // Load tree from file
 Node* load_tree(FILE *fp) {
     char line[MAX_LINE];
-    
+
     if (fgets(line, MAX_LINE, fp) == NULL) {
         return NULL;
     }
-    
+
     // Remove newline
     line[strcspn(line, "\n")] = 0;
-    
+
     if (strcmp(line, "NULL") == 0) {
         return NULL;
     }
-    
+
     Node *node = create_node(line);
     node->yes = load_tree(fp);
     node->no = load_tree(fp);
@@ -99,7 +99,7 @@ void play_game(Node **current) {
         // This shouldn't happen in a well-formed tree, but handle it
         return;
     }
-    
+
     // If this is a leaf node (both children are NULL), it's a guess
     if ((*current)->yes == NULL && (*current)->no == NULL) {
         if (get_yes_no((*current)->question)) {
@@ -108,7 +108,7 @@ void play_game(Node **current) {
             // Computer guessed wrong, need to learn
             char animal[MAX_LINE];
             char difference[MAX_LINE];
-            
+
             // Extract the guessed animal name from the question (e.g., "Is it a human?" -> "human")
             char guessed_animal[MAX_LINE];
             strcpy(guessed_animal, (*current)->question);
@@ -119,30 +119,30 @@ void play_game(Node **current) {
             if (guessed_animal[strlen(guessed_animal) - 1] == '?') {
                 guessed_animal[strlen(guessed_animal) - 1] = '\0';
             }
-            
+
             get_line("What animal were you thinking of", animal, MAX_LINE);
             printf("What question would distinguish a %s from a %s", guessed_animal, animal);
             get_line("", difference, MAX_LINE);
-            
+
             // Create new nodes
             char new_question[MAX_LINE];
             snprintf(new_question, MAX_LINE, "Is it a %s?", animal);
-            
+
             Node *old_guess = *current;
             Node *new_animal = create_node(new_question);
             Node *old_animal = create_node((*current)->question);
-            
+
             // The current node becomes the distinguishing question
             free(old_guess->question);
             old_guess->question = (char*)malloc(strlen(difference) + 1);
             strcpy(old_guess->question, difference);
-            
+
             // Ask which answer leads to the new animal
             printf("For a %s, what is the answer to \"%s\" (yes/no): ", animal, difference);
             char answer[MAX_LINE];
             fgets(answer, MAX_LINE, stdin);
             answer[strcspn(answer, "\n")] = 0;
-            
+
             if (strcasecmp(answer, "yes") == 0 || strcasecmp(answer, "y") == 0) {
                 old_guess->yes = new_animal;
                 old_guess->no = old_animal;
@@ -150,12 +150,12 @@ void play_game(Node **current) {
                 old_guess->yes = old_animal;
                 old_guess->no = new_animal;
             }
-            
+
             printf("Thanks! I'll remember that for next time.\n");
         }
         return;
     }
-    
+
     // This is an internal node, ask the question
     if (get_yes_no((*current)->question)) {
         play_game(&((*current)->yes));
@@ -172,32 +172,32 @@ Node* init_tree() {
 int main() {
     Node *root = NULL;
     FILE *fp;
-    
+
     // Try to load existing tree
     fp = fopen(DATA_FILE, "r");
     if (fp != NULL) {
         root = load_tree(fp);
         fclose(fp);
     }
-    
+
     // If no saved tree, initialize with starting question
     if (root == NULL) {
         root = init_tree();
     }
-    
+
     printf("Welcome to the Animal Guessing Game!\n");
     printf("Think of an animal and I'll try to guess it.\n\n");
-    
+
     // Game loop
     while (1) {
         play_game(&root);
-        
+
         if (!get_yes_no("\nDo you want to play again")) {
             break;
         }
         printf("\n");
     }
-    
+
     // Save the tree
     fp = fopen(DATA_FILE, "w");
     if (fp != NULL) {
@@ -207,7 +207,7 @@ int main() {
     } else {
         fprintf(stderr, "Warning: Could not save game data to %s\n", DATA_FILE);
     }
-    
+
     free_tree(root);
     return 0;
 }
